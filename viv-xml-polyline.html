@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html> 
+<head> 
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> 
+    <title>API Google Maps - âûâîä ïîëèëèíèè èç XML-ôàéëà</title> 
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+    <script>
+</head> 
+<body onunload="GUnload()"> 
+    <button onclick="map.setMapTypeId(google.maps.MapTypeId.TERRAIN);">Show TERRAIN</button>
+    <button onclick="map.setMapTypeId(google.maps.MapTypeId.ROADMAP);">Show ROADMAP</button>
+    <br><br>
+    <div id="map" style="width:1280px; height:900px"></div>       
+ 
+    <script type="text/javascript"> 
+    //<![CDATA[
+        var map;
+        
+        function initialize() {
+        var mapOptions = {
+          zoom: 4,
+          center: new google.maps.LatLng(-33, 151),
+          mapTypeControl: true,
+          mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.DEFAULT,
+            mapTypeIds: [
+              google.maps.MapTypeId.ROADMAP,
+              google.maps.MapTypeId.TERRAIN
+            ]
+          },
+          zoomControl: true,
+          zoomControlOptions: {
+            style: google.maps.ZoomControlStyle.SMALL
+          }
+        };
+
+        var map = new google.maps.Map(document.getElementById('map'),
+                                      mapOptions);
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+        if (GBrowserIsCompatible()) { 
+     
+           // Îïðåäåëÿåì êàðòó è äîáàâëÿåì ýëåìåíòû óïðàâëåíèÿ
+//          map = new GMap2(document.getElementById("map"));
+//          map.addControl(new GLargeMapControl());
+//          map.addControl(new GMapTypeControl());
+
+
+          // ×èòàåì äàííûå èç XML-ôàéëà
+     
+          //var request = getAjaxObject();
+          var request = GXmlHttp.create();
+          request.open("GET", "http://localhost/viv-xml.php", true);
+          request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+    		
+              var xmlDoc = GXml.parse(request.responseText);
+    			
+    			//alert("xml=" + request.responseText);
+              
+    		  var markers = xmlDoc.documentElement.getElementsByTagName("marker");                             
+    		  
+     
+              // ========= Îáðàáîòêà ïîëèëèíèè ===========
+              var lines = xmlDoc.documentElement.getElementsByTagName("line1");
+              // ÷èòàåì êàæäóþ ëèíèþ
+    		  //alert(lines.length);
+              for (var a = 0; a < lines.length; a++) {
+                // îïðåäåëÿåì àòðèáóòû ëèíèè - öâåò è øèðèíó
+                var colour = lines[a].getAttribute("color");
+                var width  = parseFloat(lines[a].getAttribute("width"));
+                // ÷èòàåì êàæäóþ âåðøèíó ïîëèëèíèè
+                var points = lines[a].getElementsByTagName("point");
+                var pts = [];
+                for (var i = 0; i < points.length; i++) {
+         //         pts.push( new google.maps.LatLng( parseFloat(points[i].getAttribute("lat")),
+           //                            parseFloat(points[i].getAttribute("lng")) ));
+//                   pts[i] = new GLatLng();
+
+       //            if( i == 0 )
+         //             map.setCenter(pts[i], 13);
+    								   
+    				
+                }
+
+             //   var flightPath = new google.maps.Polyline({path: pts, geodesic: true, strokeColor: colour,
+               //       strokeOpacity: 1.0, strokeWeight: width});
+
+//                flightPath.setMap( map );
+    			
+    			
+              }
+              // ================================================           
+            }
+          }
+          request.send(null);
+     
+        }
+     
+        // display a warning if the browser was not compatible
+        else {
+          alert("Ê ñîæàëåíèþ, API Êàðò Google, íå ñîâìåñòèìûå ñ äàííûì áðàóçåðîì");    }
+     
+     
+        //]]>
+    </script> 
+  </body> 
+ 
+</html>
