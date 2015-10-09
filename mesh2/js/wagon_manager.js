@@ -23,12 +23,11 @@ WagonManager.prototype.move = function () {
 			for (var wagon in data) {
 				var w = data[wagon];
 				if (!(wagon in this.wagons)) { //[ такой вагон еще не добавили на карту ]//
-					var new_wagon = new Wagon(this.map, w);
+					var new_wagon = new Wagon( this.map );
 					this.wagons[ wagon ] = new_wagon;
 				}
-				else { //[ вагон есть на карте, просто меняем его координаты ]//
-					this.wagons[wagon].setPos( w ); 
-				}
+
+				this.wagons[wagon].setPos( w ); 
 			}
 		}
 	}.bind(this);
@@ -42,9 +41,8 @@ WagonManager.prototype.runGear = function( map ) {
 	}, this.interval);
 };
 
-var Wagon = function( map, data ) {
+var Wagon = function( map ) {
 	this.map_marker = new google.maps.Marker( {
-		position: new google.maps.LatLng( data.lat, data.lng ),
 		icon: 'images/train.png',
 		title: 'wagon 1',
 		animation: google.maps.Animation.BOUNCE,
