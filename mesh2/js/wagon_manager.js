@@ -18,16 +18,16 @@ WagonManager.prototype.move = function () {
 	request.send(null);
 	request.onreadystatechange = function () {
 		if (request.readyState == 4 && request.responseText.length > 0) {
-			var json_wagons = JSON.parse(request.responseText);
-			var data = json_wagons.data;
-			for (var wagon in data) {
-				var w = data[wagon];
-				if (!(wagon in this.wagons)) { //[ такой вагон еще не добавили на карту ]//
-					var new_wagon = new Wagon( this.map );
-					this.wagons[ wagon ] = new_wagon;
+			var json = JSON.parse(request.responseText);
+			var json_wagons = json.data;
+			for (var jw in json_wagons) {
+				var jwagon = json_wagons[jw];
+				if (!(jw in this.wagons)) { //[ такой вагон еще не добавили на карту ]//
+					var new_wagon = new Wagon( this.map, jwagon );
+					this.wagons[ jw ] = new_wagon;
 				}
 
-				this.wagons[wagon].setPos( w ); 
+				this.wagons[jw].setPos( jwagon ); 
 			}
 		}
 	}.bind(this);
@@ -41,20 +41,21 @@ WagonManager.prototype.runGear = function( map ) {
 	}, this.interval);
 };
 
-var Wagon = function( map ) {
+var Wagon = function( map, data ) {
+	this.name = data.name;
 	this.map_marker = new google.maps.Marker( {
 		icon: 'images/train.png',
-		title: 'wagon 1',
+		title: data.name,
 		animation: google.maps.Animation.BOUNCE,
 		draggable: false,
 		map: map
 	} );
 	
-	this.map_marker.addListener( 'click', this.onClick );
+	this.map_marker.addListener( 'click', this.onClick.bind( this ) );
 };
 
 Wagon.prototype.onClick = function( event ) {
-	console.log( "wagon pos = " + this.getPosition() );	
+	console.log( "wagon name = " + this.name );	
 };
 
 Wagon.prototype.setPos = function( pos ) {

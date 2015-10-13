@@ -15,14 +15,14 @@ MapManager.prototype.init = function() {
   this.map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
 
-  this.wagon_manager.runGear( this.map );
+  //this.wagon_manager.runGear( this.map );
   this.mesh = new Mesh( this.map );
   
   // Create the DIV to hold the control and
   // call the CenterControl() constructor passing
   // in this DIV.
   var centerControlDiv = document.createElement('div');
-  var cc = new UgreshkaControl(this.map, centerControlDiv);
+  new UgreshkaControl(this.map, centerControlDiv);
 
   centerControlDiv.index = 1;
   this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(centerControlDiv);
@@ -33,10 +33,6 @@ MapManager.prototype.init = function() {
   google.maps.event.addDomListener(this.map, 'click', function() {
     clearSelected( this.map );
   });
-  
-  // google.maps.event.addDomListener( this.map, 'idle', function() {
-  //   this.redrawRailroad();
-  // }.bind(this) );
 };
 
 MapManager.prototype.redrawRailroad = function() {
@@ -68,7 +64,22 @@ MapManager.prototype.redrawRailroad = function() {
   
   this.mesh.clear();
   this.mesh = mesh_tmp;
-}
+  
+  this.getRoads();
+};
+
+MapManager.prototype.getRoads = function() {
+  var request = getXmlHttp();
+  request.overrideMimeType('text/xml');
+  var req = "http://localhost/mesh2/php/roads_provider.php";
+  request.open("GET", req, true);
+  request.send(null);
+  request.onreadystatechange = function () {
+    if (request.status == 200 && request.readyState == 4) {
+      console.log( request.rosponseText );
+    }
+  }.bind(this);
+};
 
 var UgreshkaControl = function(map, controlDiv) {
   // Set CSS for the control border
@@ -99,4 +110,4 @@ var UgreshkaControl = function(map, controlDiv) {
     map.setCenter(ugreshka);
     map.setZoom( 15 );
   });
-}
+};

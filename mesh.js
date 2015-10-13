@@ -30,22 +30,22 @@ function CenterControl(controlDiv, map) {
   });
 }
 
-function getXmlHttp(){
-  var xmlhttp;
-  try {
-    xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-  } catch (e) {
-    try {
-      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    } catch (E) {
-      xmlhttp = false;
-    }
-  }
-  if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
-    xmlhttp = new XMLHttpRequest();
-  }
-  return xmlhttp;
-}
+// function getXmlHttp(){
+//   var xmlhttp;
+//   try {
+//     xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+//   } catch (e) {
+//     try {
+//       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+//     } catch (E) {
+//       xmlhttp = false;
+//     }
+//   }
+//   if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
+//     xmlhttp = new XMLHttpRequest();
+//   }
+//   return xmlhttp;
+// }
 
 var map;
 var road = [];
@@ -220,35 +220,35 @@ function redrawRailroad( map ) {
   }
 }
 
-function initialize() {
-  var mapOptions = {
-    zoom: 10,
-    center: new google.maps.LatLng(55.755193, 37.627354),
-    mapTypeId: google.maps.MapTypeId.TERRAIN
-  };
-
-  map = new google.maps.Map(document.getElementById('map-canvas'),
-      mapOptions);
-
-  // Create the DIV to hold the control and
-  // call the CenterControl() constructor passing
-  // in this DIV.
-  var centerControlDiv = document.createElement('div');
-  var centerControl = new CenterControl(centerControlDiv, map);
-
-  centerControlDiv.index = 1;
-  map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(centerControlDiv);
-
-  google.maps.event.addDomListener(map, 'dragend', function() {
-      redrawRailroad( map );
-  });
-
-  google.maps.event.addDomListener(map, 'click', function() {
-    clearSelected( map );
-  });
-
-  
-}
+// function initialize() {
+//   var mapOptions = {
+//     zoom: 10,
+//     center: new google.maps.LatLng(55.755193, 37.627354),
+//     mapTypeId: google.maps.MapTypeId.TERRAIN
+//   };
+// 
+//   map = new google.maps.Map(document.getElementById('map-canvas'),
+//       mapOptions);
+// 
+//   // Create the DIV to hold the control and
+//   // call the CenterControl() constructor passing
+//   // in this DIV.
+//   var centerControlDiv = document.createElement('div');
+//   var centerControl = new CenterControl(centerControlDiv, map);
+// 
+//   centerControlDiv.index = 1;
+//   map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(centerControlDiv);
+// 
+//   google.maps.event.addDomListener(map, 'dragend', function() {
+//       redrawRailroad( map );
+//   });
+// 
+//   google.maps.event.addDomListener(map, 'click', function() {
+//     clearSelected( map );
+//   });
+// 
+//   
+// }
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
