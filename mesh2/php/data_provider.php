@@ -9,10 +9,15 @@ $color_main = "#071928";
 $color_station = "071928";
 $q = 'SELECT mesh_point.*, way.* FROM mesh_point' .
 	' LEFT JOIN way ON (way.id = mesh_point.way_id)' .
-	' WHERE latitude < ' . $_GET['lat0'] . 
-	' AND latitude > ' . $_GET['lat1'] . 
-	' AND longitude > ' . $_GET['lon0'] .
-	' AND longitude < ' . $_GET['lon1'] .
+	// ' WHERE latitude < ' . $_GET['lat0'] . 
+	// ' AND latitude > ' . $_GET['lat1'] . 
+	// ' AND longitude > ' . $_GET['lon0'] .
+	// ' AND longitude < ' . $_GET['lon1'] .
+	// ' AND mesh_point.road = ' . $_GET['road'] .
+	' WHERE mesh_point.road = ' . $_GET['road'] .
+	' OR mesh_point.road = ' . $_GET['road'] % 256 .
+	' OR mesh_point.road = ' . $_GET['road'] / 256 % 256 .
+	' OR mesh_point.road = ' . $_GET['road'] /256 / 256 % 256 .
 	' ORDER BY mesh_path_id';
 
 $result = mysql_query($q);

@@ -11,13 +11,21 @@ if( !$stmt ) {
 }
 
 if( sqlsrv_execute( $stmt ) === false ) {
-    die( print_r( sqlsrv_errors(), true));
+    die( print_r( sqlsrv_errors(), true ) );
 }
+
+$roads = array();
 
 // Retrieve each row as an object.
 // Because no class is specified, each row will be retrieved as a stdClass object.
 // Property names correspond to field names.
 while( $obj = sqlsrv_fetch_object( $stmt ) ) {
-    echo $obj->id.". ".$obj->name."<br />";
+    $roads[ $obj->id ] = $obj->name;
+    //echo $obj->id.". ".$obj->name."<br />";
 }
+
+$data = array();
+$data['data'] = $roads;
+
+echo json_encode($data, JSON_FORCE_OBJECT);
 ?>

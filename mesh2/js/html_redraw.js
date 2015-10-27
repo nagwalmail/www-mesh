@@ -3,10 +3,62 @@ function HTMLredraw() {
 	this.mapWrap = document.querySelector('#map-canvas')
 }
 
-HTMLredraw.updateWagonsPosition = function() {
-	
-}
+HTMLredraw.prototype.createUgreshkaCtrl = function(map, controlDiv) {
+  // Set CSS for the control border
+  var ugreshka = new google.maps.LatLng( 55.717685, 37.695167 );
+  var controlUI = document.createElement('div');
+  controlUI.style.backgroundColor = '#fff';
+  controlUI.style.border = '2px solid #fff';
+  controlUI.style.borderRadius = '3px';
+  controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.marginBottom = '22px';
+  controlUI.style.textAlign = 'center';
+  controlUI.title = 'Click to recenter the map';
+  controlDiv.appendChild(controlUI);
 
-HTMLredraw.updateMap = function() {
-	
-}
+  // Set CSS for the control interior
+  var controlText = document.createElement('div');
+  controlText.style.color = 'rgb(25,25,25)';
+  controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+  controlText.style.fontSize = '16px';
+  controlText.style.lineHeight = '38px';
+  controlText.style.paddingLeft = '5px';
+  controlText.style.paddingRight = '5px';
+  controlText.innerHTML = 'Угрешская';
+  controlUI.appendChild(controlText);
+
+  google.maps.event.addDomListener(controlUI, 'click', function() {
+    map.setCenter(ugreshka);
+    map.setZoom( 15 );
+  });
+};
+
+HTMLredraw.prototype.fillRoadsSelector = function() {
+  var request = getXmlHttp();
+  request.overrideMimeType('text/xml');
+  var req = "http://localhost/mesh2/php/roads_provider.php";
+  request.open("GET", req, true);
+  request.send(null);
+  request.onreadystatechange = function () {
+    if (request.status == 200 && request.readyState == 4) {
+      var cmb = document.getElementById( 'road_cmb' );
+      while( cmb.options.length > 1 ) {
+          cmb.remove(1);
+      }
+      
+ 			var json = JSON.parse( request.responseText );
+      
+			var json_roads = json.data;
+			for( var jr in json_roads ) {
+        
+				var jroad = json_roads[ jr ];
+        var opt = document.createElement( 'option' );
+        opt.value = jr;
+        opt.innerText = jroad;
+        cmb.appendChild( opt );
+      }
+    }
+  };
+};
+

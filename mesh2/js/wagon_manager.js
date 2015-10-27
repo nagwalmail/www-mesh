@@ -7,7 +7,6 @@ WagonManager.prototype.init = function() {
 	this.wagons = [];
 	this.interval = 500;
 	this.timer;
-	this.HTMLredraw = new HTMLredraw();
 };
 
 WagonManager.prototype.move = function () {
