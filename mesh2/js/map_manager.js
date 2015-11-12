@@ -16,7 +16,7 @@ MapManager.prototype.init = function() {
   this.map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
 
-  this.wagon_manager.runGear( this.map );
+  //this.wagon_manager.runGear( this.map );
   this.mesh = new Mesh( this.map );
   
   // Create the DIV to hold the control and

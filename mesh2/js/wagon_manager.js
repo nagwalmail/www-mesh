@@ -12,7 +12,7 @@ WagonManager.prototype.init = function() {
 WagonManager.prototype.move = function () {
 	var request = getXmlHttp();
 	request.overrideMimeType('text/xml');
-	var req = "http://localhost/mesh2/php/wagons_pos.php";
+	var req = "/php/wagons_pos.php";
 	request.open("GET", req, true);
 	request.send(null);
 	request.onreadystatechange = function () {

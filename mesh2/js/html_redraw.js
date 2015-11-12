@@ -37,7 +37,7 @@ HTMLredraw.prototype.createUgreshkaCtrl = function(map, controlDiv) {
 HTMLredraw.prototype.fillRoadsSelector = function() {
   var request = getXmlHttp();
   request.overrideMimeType('text/xml');
-  var req = "http://localhost/mesh2/php/roads_provider.php";
+  var req = "/mesh/php/roads_provider.php";
   request.open("GET", req, true);
   request.send(null);
   request.onreadystatechange = function () {
