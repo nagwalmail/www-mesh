@@ -1,6 +1,7 @@
 var MapManager = function( wagon_manager ) {
 	this.map = {};
   this.mesh = {};
+  this.track = [];
   this.wagon_manager = wagon_manager;
   this.HTMLredraw = new HTMLredraw();
   google.maps.event.addDomListener(window, 'load', this.init.bind(this));
@@ -8,8 +9,8 @@ var MapManager = function( wagon_manager ) {
 
 MapManager.prototype.init = function() {
 	var mapOptions = {
-    zoom: 10,
-    center: new google.maps.LatLng(55.755193, 37.627354),
+    zoom: 18,
+    center: new google.maps.LatLng(55.957680, 38.028542),
     mapTypeId: google.maps.MapTypeId.TERRAIN
   };
 
@@ -34,10 +35,26 @@ MapManager.prototype.init = function() {
   google.maps.event.addDomListener(this.map, 'click', function() {
     clearSelected( this.map );
   });
-  
-  this.HTMLredraw.fillRoadsSelector();
+
+  $(function () {
+      $("#datetimepicker1").on("dp.change", function (e) {
+        self.drawTrack( e );     
+      }).bind( this );    
+  }).bind( this );  
+        
+  this.HTMLredraw.fillWagonsSelector();
+  //this.HTMLredraw.fillRoadsSelector();
   var cmb = document.getElementById( 'road_cmb' );
-  cmb.addEventListener( 'change', self.redrawRailroad.bind(this));
+  if( cmb != null ) {
+      cmb.addEventListener( 'change', self.redrawRailroad.bind(this));
+  }
+  
+  var cmbW = document.getElementById( 'wagon_cmb' );
+  if( cmbW != null ) {
+      cmbW.addEventListener( 'change', self.drawTrack.bind(this));
+  }
+  
+  //self.drawTrack(this);
 };
 
 MapManager.prototype.redrawRailroad = function() {
@@ -70,5 +87,53 @@ MapManager.prototype.redrawRailroad = function() {
   
   this.mesh.clear();
   this.mesh = mesh_tmp;
+};
+
+MapManager.prototype.drawTrack = function( e ) {
+  for( var i = 0; i < this.track.length; i++ ) {
+      this.track[ i ].setMap( null );
+  }
+  
+  // console.log( "date: " + e.date.format( 'DD-MM-YYYY HH:mm:ss') );
+  this.track = [];
+  var request = getXmlHttp();
+  var req = "/mesh/php/get_track.php?guid=36353431-6262-3332-6332-393534333937&\
+      date=" + e.date.format( 'DD-MM-YYYY HH:mm:ss' );
+      
+  request.open( "GET", req, true );
+  request.send( null );
+  request.onreadystatechange = function () {
+		if (request.readyState == 4 && request.responseText.length > 0) {
+			var json = JSON.parse(request.responseText);
+			var json_dots = json.data;
+      var pts = [];
+      var odd = 0;
+      for( var dot in json_dots ) {
+        var d = new google.maps.LatLng( json_dots[ dot ].lat, json_dots[ dot ].lng );
+        pts.push( d );
+        var speed = json_dots[ dot ].speed / 2;
+      
+        if( odd > 0 ) {
+          odd = 0;
+          var color = "#00" + speed * 5 + "00";
+          var polyline = new google.maps.Polyline({
+            path: pts,
+            geodesic: false,
+            strokeColor: color,
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
+          
+          polyline.setMap( this.map );
+          this.track.push( polyline );
+          pts = [];
+          pts.push( d );
+        }
+        else {
+          odd++;
+        }
+      }
+		}
+	}.bind(this);
 };
 

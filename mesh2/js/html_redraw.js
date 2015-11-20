@@ -34,6 +34,34 @@ HTMLredraw.prototype.createUgreshkaCtrl = function(map, controlDiv) {
   });
 };
 
+HTMLredraw.prototype.fillWagonsSelector = function() {
+  var request = getXmlHttp();
+  request.overrideMimeType('text/xml');
+  var req = "/mesh/php/get_wagons.php";
+  request.open("GET", req, true);
+  request.send(null);
+  request.onreadystatechange = function () {
+    console.log( "fillWagonsSelector request.status = " + request.status );
+    if (request.status == 200 && request.readyState == 4) {
+      var cmb = document.getElementById( 'wagon_cmb' );
+      while( cmb.options.length > 1 ) {
+          cmb.remove(1);
+      }
+      
+ 			var json = JSON.parse( request.responseText );
+      
+			var json_wagons = json.data;
+			for( var jw in json_wagons ) {
+				var jwagon = json_wagons[ jw ];
+        var opt = document.createElement( 'option' );
+        opt.value = jw;
+        opt.innerText = jwagon[ "name" ];
+        cmb.appendChild( opt );
+      }
+    }
+  };
+};
+
 HTMLredraw.prototype.fillRoadsSelector = function() {
   var request = getXmlHttp();
   request.overrideMimeType('text/xml');
