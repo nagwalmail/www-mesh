@@ -29,22 +29,32 @@ if( !$connect ) {
 	die();
 }
 
+
 if( $_SERVER['REQUEST_METHOD'] != "POST" ) {
 	echo "need 'POST' request";
-	exit( 1 );
+/	exit( 1 );
 }
+
 
 function checkParam( $param ) {
 	return ( !empty( $param ) );	
 }
 
+
 $wagon_id = $_GET['wi'];
 $lat = $_GET['la'];
 $lng = $_GET['ln'];
-$speed = $_GET['s'];
+$speed = $_GET['sp'];
+$gps_dt_year = $_GET['yr'];
+$gps_dt_month = $_GET['mo'];
+$gps_dt_day = $_GET['da'];
+$gps_dt_hour = $_GET['hr'];
+$gps_dt_minute = $_GET['mn'];
+$gps_dt_second = $_GET['sc'];
+
 
 function checkParams() {
-	global $wagon_id, $lat, $lng;
+	global $wagon_id, $lat, $lng, $gps_dt_year, $gps_dt_month, $gps_dt_day;
 	if( !checkParam( $wagon_id ) ) {
 		echo "'wi' not set or empty\r\n";
 		return false;
@@ -59,7 +69,16 @@ function checkParams() {
 		echo "'ln' not set or not numeric\r\n";
 		return false;
 	}
-	
+	$dt = getdate();
+	if( !checkParam( $gps_dt_year) or $gps_dt_year == 0) {
+	    $gps_dt_year = $dt[year] % 2000;
+	}
+	if( !checkParam($gps_dt_month) or $gps_dt_month == 0) {
+	    $gps_dt_month = $dt[mon];
+	}
+	if( !checkParam($gps_dt_day) or $gps_dt_day == 0) {
+	    $gps_dt_day = $dt[mday];
+	}
 	return true;
 }
 
@@ -67,11 +86,20 @@ if( !checkParams() ) {
 	exit( 1 );
 }
  
-$q = sprintf( "INSERT INTO wagon_pos (wagon_guid, lat, lng, speed) VALUES ('%s', '%f', '%f', '%d')",
+$q = sprintf( "INSERT INTO wagon_pos (wagon_guid, lat, lng, speed, gps_date) 
+	VALUES ('%s', '%f', '%f', '%d', '%d-%d-%d %d:%d:%d')",
 	addslashes( $wagon_id ), 
 	addslashes( $lat ), 
 	addslashes( $lng ), 
-	addslashes( $speed ) );
+	addslashes( $speed ),
+	addslashes( $gps_dt_day ),
+	addslashes( $gps_dt_month ),
+	addslashes( $gps_dt_year + 2000 ),
+	addslashes( $gps_dt_hour ),
+	addslashes( $gps_dt_minute ),
+	addslashes( $gps_dt_second ) );
+
+echo($q);
 
 $result = odbc_exec( $connect, $q ); 
 if( $result ) {
@@ -81,5 +109,4 @@ else {
 	echo "mssql error: " . odbc_errormsg( $connect );
 	exit( 1 );
 }
-
 ?>

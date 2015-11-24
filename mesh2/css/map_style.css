@@ -19,6 +19,12 @@ time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 }
+
+.h2, h2 {
+    font-size: 20px;
+	margin-top: 10px;	
+	margin-bottom: 10px;	
+}
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
@@ -44,6 +50,7 @@ table {
 	border-spacing: 0;
 }
 /* End of Eric Meyer's CSS Reset */
+
 
 article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
 	display: block;
@@ -77,25 +84,29 @@ body {
 }
 
 #map-canvas {
-	
-	min-height: 600px;
-	
+	min-height: 700px;
+}
+
+#redrawBtn2 {
+	margin-top: 10px;	
+	margin-bottom: 10px;	
 }
 
 .control_panel {
 	float: right;
-	min-height: 600px;
+	min-height: 700px;
 	min-width: 100px;
 	position: relative;
-	background: #FFACAA;
+	/*background: #FFACAA;*/
 	font-family: "Roboto";
 	padding: 0px 20px;
 	font-size: 10pt;
 	text-shadow: 0px 1px 0 #ccc;
-	background-color: rgb(200, 200, 200);
+	/*background-color: rgb(200, 200, 200);*/
 }
 
-.container_ {
+
+.container1 {
 	width: 200px;
 }
 /* Footer
@@ -108,4 +119,3 @@ body {
 .firstHeading {
 	font-weight: bold;
 }
-

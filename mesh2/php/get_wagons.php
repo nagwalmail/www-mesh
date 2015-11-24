@@ -1,7 +1,8 @@
 <?php
 include( "mssql.php" );
 
-$q = "SELECT LEFT( name, CHARINDEX('(', (select top(1) name from wagon)) - 2 ) as name from wagon";
+$q = "SELECT LEFT( name, CHARINDEX('(', (select top(1) name from wagon)) - 2 ) as name 
+	FROM wagon";
 	
 $json_result = array();
 $result = odbc_exec( $connect, $q );

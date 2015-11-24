@@ -9,12 +9,12 @@ if( !$connect ) {
 }
 
 $q = 'select wp1.wagon_guid, wp1.lat / 60. as lat, wp1.lng / 60. as lng, 
-	wp1.speed, wp1.date, wagon.name from wagon_pos wp1 
+	wp1.speed, wp1.gps_date, wagon.name from wagon_pos wp1 
 	left join wagon on (wagon.guid = wp1.wagon_guid)
 	join
-	(select wagon_guid, max(date) as date 
+	(select wagon_guid, max(gps_date) as gps_date 
 		from wagon_pos group by wagon_guid) as wp2 
-	on wp1.wagon_guid = wp2.wagon_guid and wp1.date = wp2.date
+	on wp1.wagon_guid = wp2.wagon_guid and wp1.gps_date = wp2.gps_date
 	order by wp1.wagon_guid';
 
 $result = odbc_exec( $connect, $q );
@@ -23,7 +23,7 @@ $json_result = array();
 while( $row = odbc_fetch_array( $result ) ) {
 	$json_result[ $row[ 'wagon_guid' ] ] = array(
 		'name'  => $row[ 'name' ] == null ? "unknown_wagon" : $row[ 'name' ],
-		'date' => $row[ 'date' ],
+		'date' => $row[ 'gps_date' ],
 		'lat' => $row[ 'lat' ],
 		'lng' => $row[ 'lng' ]
 	);

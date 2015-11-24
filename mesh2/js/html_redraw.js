@@ -44,6 +44,9 @@ HTMLredraw.prototype.fillWagonsSelector = function() {
     console.log( "fillWagonsSelector request.status = " + request.status );
     if (request.status == 200 && request.readyState == 4) {
       var cmb = document.getElementById( 'wagon_cmb' );
+      if( cmb == null )
+        return;
+        
       while( cmb.options.length > 1 ) {
           cmb.remove(1);
       }
@@ -71,6 +74,9 @@ HTMLredraw.prototype.fillRoadsSelector = function() {
   request.onreadystatechange = function () {
     if (request.status == 200 && request.readyState == 4) {
       var cmb = document.getElementById( 'road_cmb' );
+      if( cmb == null )
+        return;
+        
       while( cmb.options.length > 1 ) {
           cmb.remove(1);
       }
