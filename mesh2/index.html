@@ -16,6 +16,7 @@
     
     <script src="js/helper_functions.js"></script>
     <script src="js/html_redraw.js"></script>
+    <script src="js/track.js"></script>
     <script src="js/mesh_components.js"></script>
     <script src="js/map_manager.js"></script>
     <script src="js/wagon_manager.js"></script>
@@ -44,6 +45,21 @@
               Настройки
             </div>
             <div class="panel-body">
+              
+              <!-- Список вагонов -->
+            <p>Вагон</p>
+            <!--<div class="btn-group" id="wagonDropdown">
+              <button class="btn btn-default btn-sm dropdown-toggle" type="button" 
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Выберите вагон <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+              </ul>
+            </div>-->
+            <div class="dropdown" id="wagonDropdown" >
+                <a data-toggle="dropdown" class="downarrow dropdown-toggle" href="#">Вагон</a>
+            </div>              
+                          
             <p>Дата начала проезда:</p>
             <div class="container1">
               

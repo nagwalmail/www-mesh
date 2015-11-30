@@ -15,6 +15,7 @@ $q = 'select wp1.wagon_guid, wp1.lat / 60. as lat, wp1.lng / 60. as lng,
 	(select wagon_guid, max(gps_date) as gps_date 
 		from wagon_pos group by wagon_guid) as wp2 
 	on wp1.wagon_guid = wp2.wagon_guid and wp1.gps_date = wp2.gps_date
+	where name is not null
 	order by wp1.wagon_guid';
 
 $result = odbc_exec( $connect, $q );

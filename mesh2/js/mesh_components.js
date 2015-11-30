@@ -51,3 +51,4 @@ function MeshPath( id, way, data, map ) {
 	this.polyline.setMap( map );
 	this.polyline.addListener( 'click', way.onClick.bind( way ) );
 };
+

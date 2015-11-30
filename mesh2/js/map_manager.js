@@ -1,10 +1,10 @@
 var MapManager = function( wagon_manager ) {
 	this.map = {};
   this.mesh = {};
-  this.track = [];
+  this.track = {};
   this.wagon_manager = wagon_manager;
   this.HTMLredraw = new HTMLredraw();
-  google.maps.event.addDomListener(window, 'load', this.init.bind(this));
+  google.maps.event.addDomListener( window, 'load', this.init.bind( this ) );
 }
 
 MapManager.prototype.init = function() {
@@ -14,53 +14,47 @@ MapManager.prototype.init = function() {
     mapTypeId: google.maps.MapTypeId.TERRAIN
   };
 
-  this.map = new google.maps.Map(document.getElementById('map-canvas'),
-      mapOptions);
+  this.map = new google.maps.Map( document.getElementById('map-canvas'), mapOptions );
 
-  //this.wagon_manager.runGear( this.map );
+  this.wagon_manager.runGear( this.map );
   this.mesh = new Mesh( this.map );
+  this.track = new Track( this.map );
   
-  // Create the DIV to hold the control and
-  // call the CenterControl() constructor passing
-  // in this DIV.
-  var centerControlDiv = document.createElement('div');
-  this.HTMLredraw.createUgreshkaCtrl(this.map, centerControlDiv);
-
-  centerControlDiv.index = 1;
-  this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(centerControlDiv);
-  
+  this.HTMLredraw.createUgreshkaCtrl( this.map );
   var self = this;
   //google.maps.event.addDomListener(this.map, 'dragend', self.redrawRailroad.bind(this));
 
-  google.maps.event.addDomListener( this.map, 'click', function() {
-    clearSelected( this.map );
-  } );
+  // google.maps.event.addDomListener( this.map, 'click', function() {
+  //   clearSelected( this.map );
+  // } );
 
-  // document.getElementById( 'redrawBtn' ).addEventListener( 'click', function() {
-  //   self.drawTrack();
-  // });
-
-  $("#redrawBtn2").on( "click", function( e ) {
-      self.drawTrack();
-  }).bind( this );
-  
-  document.getElementById( 'get_track_progress' ).style.visibility = "hidden";
-  $("#datetimepicker1").data("DateTimePicker").date( moment().subtract( 1, 'days') ) ;
-  $("#datetimepicker2").data("DateTimePicker").date( moment()) ;
+  this.HTMLredraw.createDrawTrackButton( this );
+  this.HTMLredraw.stopProgress();
+  this.HTMLredraw.fillDateSelectors();
   this.HTMLredraw.fillWagonsSelector();
+  
+  $('#wagonDropdown').on( 'click', 'a[data-toggle="dropdown"]', function() {   
+      if( $(this).children().length <= 0 ) {
+          $(this).after( 
+            '<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" >'+ 
+            '<li><a href="#">Edit</a></li><li><a href="#">Report</a></li><li><a href="#">Delete</a></li></ul>' 
+          );
+          
+          $(this).dropdown();
+      }
+  } );
+  
   
   //this.HTMLredraw.fillRoadsSelector();
   var cmb = document.getElementById( 'road_cmb' );
   if( cmb != null ) {
-      cmb.addEventListener( 'change', self.redrawRailroad.bind(this));
+      cmb.addEventListener( 'change', self.redrawRailroad.bind(this) );
   }
   
   var cmbW = document.getElementById( 'wagon_cmb' );
   if( cmbW != null ) {
-      cmbW.addEventListener( 'change', self.drawTrack.bind(this));
+      cmbW.addEventListener( 'change', self.drawTrack.bind(this) );
   }
-  
-  //self.drawTrack(this);
 };
 
 MapManager.prototype.redrawRailroad = function() {
@@ -95,94 +89,28 @@ MapManager.prototype.redrawRailroad = function() {
   this.mesh = mesh_tmp;
 };
 
-MapManager.prototype.drawTrack = function() {
-  for( var i = 0; i < this.track.length; i++ ) {
-      this.track[ i ].setMap( null );
+MapManager.prototype.drawTrack = function( wagon_guid, date_from, date_to ) {
+  this.track.clear();
+  if( date_from == null || date_to == null ) {
+      return;
   }
   
-  var dateFrom =  $("#datetimepicker1").data("DateTimePicker");
-  var dateTo =  $("#datetimepicker2").data("DateTimePicker");
-  if( dateFrom.date() == null ) {
-    dateFrom.toggle();
-    return;
-  }
-  
-  if( dateTo.date() == null ) {
-    dateTo.toggle();
-    return;
-  }
-  
-  document.getElementById( 'get_track_progress' ).style.visibility = "visible";
-  this.track = [];
+  this.HTMLredraw.startProgress();
   var request = getXmlHttp();
-  var req = "/mesh/php/get_track.php?guid=36353431-6262-3332-6332-393534333937&\
-      date_from=" + dateFrom.date().subtract( 3, 'hour' ).format( 'DD-MM-YYYY HH:mm:ss' ) +
-      "&date_to=" + dateTo.date().subtract( 3, 'hour' ).format( 'DD-MM-YYYY HH:mm:ss' );
+  var req = "/mesh/php/get_track.php?guid=" + wagon_guid + "&\
+      date_from=" + date_from.format( 'DD-MM-YYYY HH:mm:ss' ) + "&\
+      date_to=" + date_to.format( 'DD-MM-YYYY HH:mm:ss' );
       
   console.log( req );
   request.open( "GET", req, true );
   request.send( null );
   request.onreadystatechange = function () {
 		if( request.readyState == 4 && request.responseText.length > 0 ) {
-      var footer = document.getElementById( 'footer' );
-      //footer.innerText = request.responseText;
 			var json = JSON.parse( request.responseText );
-			var json_dots = json.data;
-      var pts = [];
-      var odd = 0;
-      document.getElementById( 'label_dots_count' ).innerHTML = "Точек: " + json_dots.length;
-      
-      for( var dot in json_dots ) {
-        var d = new google.maps.LatLng( json_dots[ dot ].lat, json_dots[ dot ].lng );
-        pts.push( d );
-        var speed = Math.round(json_dots[ dot ].speed / 2);
-      
-        if( odd > 5 ) {
-          odd = 0;
-          var red = zeroFill( (255 - speed * 5).toString( 16 ), 2 );
-          var green = zeroFill( (speed * 5).toString( 16 ), 2 );
-          var color = "#" + red + green + "00";
-          var polyline = new google.maps.Polyline({
-            path: pts,
-            geodesic: false,
-            strokeColor: color,
-            strokeOpacity: 1.0,
-            strokeWeight: 2
-          });
-          
-          polyline.info = json_dots[ dot ];
-          polyline.setMap( this.map );
-          polyline.addListener( 'click', function( e ) {
-              document.getElementById( 'label_speed' ).innerHTML = 
-                  "Скорость: " + this.info.speed + " км/ч";          
-
-              document.getElementById( 'label_date' ).innerHTML = 
-                  "Дата: " + moment( this.info.date ).add( 3, 'hour' ).format( 'DD-MM-YYYY HH:mm' );          
-          } );
-          
-          this.track.push( polyline );
-          pts = [];
-          pts.push( d );
-        }
-        else {
-          odd++;
-        }
-      }
-      
-      document.getElementById( 'get_track_progress' ).style.visibility = "hidden";
+      this.HTMLredraw.updateDotsCount( json.data.length );
+      this.track.createFromJson( json.data );
+      this.HTMLredraw.stopProgress();
 		}
 	}.bind(this);
-  
-  
 };
-
-function zeroFill( number, width )
-{
-  var n = number > 0xFF ? 0xFF : number;
-  while( n.length < width ) {
-    n = "0" + n;
-  }
-  
-  return n;
-}
 
