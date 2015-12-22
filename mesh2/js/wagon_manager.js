@@ -5,8 +5,9 @@ var WagonManager = function() {
 
 WagonManager.prototype.init = function() {
 	this.wagons = [];
-	this.interval = 500;
-	this.timer;
+	this.wagons_list = [];
+	this.interval = 1000;
+	this.timeout;
 };
 
 WagonManager.prototype.move = function () {
@@ -28,6 +29,10 @@ WagonManager.prototype.move = function () {
 
 				this.wagons[jw].setPos( jwagon ); 
 			}
+			
+			this.timeout = setTimeout( function() {
+				this.move();
+			}.bind( this ), this.interval );
 		}
 	}.bind(this);
 };
@@ -35,10 +40,15 @@ WagonManager.prototype.move = function () {
 WagonManager.prototype.runGear = function( map ) {
 	var self = this;
 	self.map = map;
-	this.timer = setInterval( function() {
+	this.timeout = setTimeout( function() {
 		self.move();		
 	}, this.interval);
 };
+
+WagonManager.prototype.stopGear = function() {
+	console.log( "### clear timeout " + this.timeout );
+	clearTimeout( this.timeout );
+}
 
 var Wagon = function( map, data ) {
 	this.name = data.name;
@@ -61,4 +71,26 @@ Wagon.prototype.setPos = function( pos ) {
 	this.map_marker.setOptions( { 
 		position: new google.maps.LatLng( pos.lat, pos.lng )
 	} );
+}
+
+WagonManager.prototype.getWagonsList = function( callback ) {
+	var request = getXmlHttp();
+	request.overrideMimeType('text/xml');
+	var req = "/mesh/php/get_wagons.php";
+	request.open("GET", req, true);
+	request.send(null);
+	request.onreadystatechange = function () {
+		console.log("fillWagonsSelector request.status = " + request.status);
+		if (request.status == 200 && request.readyState == 4) {
+			var json = JSON.parse(request.responseText);
+			console.log( json.data );
+			var json_wagons = json.data;
+			for (var jw in json_wagons) {
+				var jwagon = json_wagons[jw];
+				this.wagons_list.push( jwagon );
+			}
+			
+			callback();
+		}
+	}.bind( this );
 }

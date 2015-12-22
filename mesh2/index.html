@@ -46,19 +46,20 @@
             </div>
             <div class="panel-body">
               
-              <!-- Список вагонов -->
-            <p>Вагон</p>
-            <!--<div class="btn-group" id="wagonDropdown">
-              <button class="btn btn-default btn-sm dropdown-toggle" type="button" 
-                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Выберите вагон <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu">
-              </ul>
-            </div>-->
-            <div class="dropdown" id="wagonDropdown" >
+            <div class="dropdown">
+              <a data-toggle="dropdown" class="downarrow dropdown-toggle" href="#">
+                Вагон
+              </a>
+                <!--<span class="caret"></span>-->
+              <!--</button>-->
+              <!--<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+              </ul>-->
+            </div>           
+
+            <!--<div class="dropdown" id="wagonDropdown" >
                 <a data-toggle="dropdown" class="downarrow dropdown-toggle" href="#">Вагон</a>
-            </div>              
+            </div>              -->
+            
                           
             <p>Дата начала проезда:</p>
             <div class="container1">
@@ -107,7 +108,7 @@
               </div>
             </div>
     
-            <button type="button" class="btn btn-default btn" id="redrawBtn2">
+            <button type="button" class="btn btn-primary" id="redrawBtn2">
                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Обновить
             </button>
     
@@ -125,15 +126,15 @@
                     Инфо
                 </div>
                 <div class="panel-body">
-                    <h2>
-                        <span class="label label-primary" id="label_dots_count">Точек:</span>
-                    </h2>
-                    <h2>                  
-                        <span class="label label-primary" id="label_speed">Скорость:</span>
-                    </h2>
-                    <h2>
-                        <span class="label label-primary" id="label_date">Дата:</span>
-                    </h2>
+                    <h3>
+                        <span class="label label-info" id="label_dots_count">Точек:</span>
+                    </h3>
+                    <h3>                  
+                        <span class="label label-info" id="label_speed">Скорость:</span>
+                    </h3>
+                    <h3>
+                        <span class="label label-info" id="label_date">Дата:</span>
+                    </h3>
                 </div>
             </div>
             <!--<p class="direction">direction</p>

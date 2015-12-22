@@ -1,6 +1,6 @@
 <?php
-include( "mssql.php" );
 
+//echo( "куку на!" );
 $guid = $_GET[ 'guid' ]; 
 $date_from = $_GET[ 'date_from' ];
 $date_to = $_GET[ 'date_to' ];
@@ -26,7 +26,9 @@ $q = "with x as (
 	. "' and gps_date <= '" . $date_to
 	. "') / " . $max_dots_count . ") = 0";
 	
-//echo( "sql: " . $q );
+//echo( $q );
+
+include( "mssql.php" );
 
 $json_result = array();
 $result = odbc_exec( $connect, $q );

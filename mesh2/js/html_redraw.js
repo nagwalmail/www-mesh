@@ -73,35 +73,74 @@ HTMLredraw.prototype.updateDotsCount = function( count ) {
     document.getElementById( 'label_dots_count' ).innerHTML = "Точек: " + count;
 }
 
-HTMLredraw.prototype.fillWagonsSelector = function() {
-  var request = getXmlHttp();
-  request.overrideMimeType('text/xml');
-  var req = "/mesh/php/get_wagons.php";
-  request.open("GET", req, true);
-  request.send(null);
-  request.onreadystatechange = function () {
-    console.log( "fillWagonsSelector request.status = " + request.status );
-    if (request.status == 200 && request.readyState == 4) {
-      // var cmb = document.getElementById( 'wagon_cmb' );
-      // if( cmb == null )
-      //   return;
-      //   
-      // while( cmb.options.length > 1 ) {
-      //     cmb.remove(1);
-      // }
-      
- 			var json = JSON.parse( request.responseText );
-      
-			var json_wagons = json.data;
-			for( var jw in json_wagons ) {
-				var jwagon = json_wagons[ jw ];
-        var opt = document.createElement( 'option' );
-        opt.value = jw;
-        opt.innerText = jwagon[ "name" ];
-        // cmb.appendChild( opt );
-      }
+HTMLredraw.prototype.fillWagonsSelector = function( wm ) {
+  wm.getWagonsList(function () {
+    var cmbItems = "";
+    console.log("wagons.length = " + wm.wagons_list.length);
+    for (var w in wm.wagons_list) {
+      var wagon = wm.wagons_list[w];
+      cmbItems += '<li><a href="#" '
+      + ' id="' + wagon.id + '">'
+      + wagon.name.trim()
+      + '</a></li>';
     }
-  };
+
+    $('.dropdown').on('click', 'a[data-toggle="dropdown"]', function () {
+      console.log( "OnWagonDropdown" );
+      if ($(this).children().length <= 0) {
+          console.log( "OnWagonDropdown length <=0" );
+        $(this).after('<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" >' +
+          cmbItems + '</ul>');
+
+        $(this).dropdown();
+      }
+    });
+
+    $('.dropdown').on('click', 'li', function ( event ) {
+      console.log( "selected " + event.currentTarget.innerText );
+      var selText = $(this).text();
+      $(this).parents('.dropdown').find('.dropdown-toggle').html(selText);
+       //$('.dropdown').html($(this).find('a').html());
+    });
+  });
+  
+  // var request = getXmlHttp();
+  // request.overrideMimeType('text/xml');
+  // var req = "/mesh/php/get_wagons.php";
+  // request.open("GET", req, true);
+  // request.send(null);
+  // request.onreadystatechange = function () {
+  //   console.log( "fillWagonsSelector request.status = " + request.status );
+  //   var cmbItems = "";
+  //   if (request.status == 200 && request.readyState == 4) {
+ 	// 		var json = JSON.parse( request.responseText );
+	// 		var json_wagons = json.data;
+	// 		for( var jw in json_wagons ) {
+	// 			var jwagon = json_wagons[ jw ];
+  //       cmbItems += '<li><a href="#" '
+  //         + ' id="' + jwagon[ "id" ] + '">'  
+  //         + jwagon[ "name" ].trim()
+  //         + '</a></li>';
+  //     }
+      
+      
+      
+      
+  //     console.log( cmbItems );
+  //     $('#wagonDropdown').on( 'click', 'a[data-toggle="dropdown"]', function() {   
+  //         if( $(this).children().length <= 0 ) {
+  //             $(this).after( '<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" >'+
+  //                 cmbItems + '</ul>' );
+  //                 
+  //             $(this).dropdown();
+  //         }
+  //     } );
+  //     
+  //     $('#wagonDropdown').on( 'click', 'li', function() {
+  //         console.log( "selected " + this.id );
+  //     } );
+  //   }
+  // };
 };
 
 HTMLredraw.prototype.fillRoadsSelector = function() {

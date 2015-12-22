@@ -39,7 +39,7 @@ $password = '123';
 // }
 
 
-$connect = odbc_connect( $source_name, $login, $password );
+$connect = odbc_connect( $source_name, $login, $password, SQL_CUR_USE_ODBC );
 
 if( !$connect ) {
 	debug_to_console( "connect error: " . odbc_errormsg() );

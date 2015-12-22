@@ -16,7 +16,7 @@ MapManager.prototype.init = function() {
 
   this.map = new google.maps.Map( document.getElementById('map-canvas'), mapOptions );
 
-  this.wagon_manager.runGear( this.map );
+//  this.wagon_manager.runGear( this.map );
   this.mesh = new Mesh( this.map );
   this.track = new Track( this.map );
   
@@ -31,19 +31,7 @@ MapManager.prototype.init = function() {
   this.HTMLredraw.createDrawTrackButton( this );
   this.HTMLredraw.stopProgress();
   this.HTMLredraw.fillDateSelectors();
-  this.HTMLredraw.fillWagonsSelector();
-  
-  $('#wagonDropdown').on( 'click', 'a[data-toggle="dropdown"]', function() {   
-      if( $(this).children().length <= 0 ) {
-          $(this).after( 
-            '<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" >'+ 
-            '<li><a href="#">Edit</a></li><li><a href="#">Report</a></li><li><a href="#">Delete</a></li></ul>' 
-          );
-          
-          $(this).dropdown();
-      }
-  } );
-  
+  this.HTMLredraw.fillWagonsSelector( this.wagon_manager );
   
   //this.HTMLredraw.fillRoadsSelector();
   var cmb = document.getElementById( 'road_cmb' );
@@ -95,7 +83,9 @@ MapManager.prototype.drawTrack = function( wagon_guid, date_from, date_to ) {
       return;
   }
   
+  this.HTMLredraw.updateDotsCount( 0 );
   this.HTMLredraw.startProgress();
+  this.wagon_manager.stopGear();
   var request = getXmlHttp();
   var req = "/mesh/php/get_track.php?guid=" + wagon_guid + "&\
       date_from=" + date_from.format( 'DD-MM-YYYY HH:mm:ss' ) + "&\
@@ -110,6 +100,7 @@ MapManager.prototype.drawTrack = function( wagon_guid, date_from, date_to ) {
       this.HTMLredraw.updateDotsCount( json.data.length );
       this.track.createFromJson( json.data );
       this.HTMLredraw.stopProgress();
+      this.wagon_manager.runGear( this.map );
 		}
 	}.bind(this);
 };

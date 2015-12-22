@@ -6,8 +6,10 @@ function Track( map ) {
 
 Track.prototype.clear = function() {
 	for( var i = 0; i < this.track_path.length; i++ ) {
-    	this.track_path[ i ].setMap( null );
+    	this.track_path[ i ].polyline.setMap( null );
   	}
+	  
+	this.track_path = [];
 };
 
 Track.prototype.createFromJson = function( json_dots ) {

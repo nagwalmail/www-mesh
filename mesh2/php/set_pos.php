@@ -32,7 +32,7 @@ if( !$connect ) {
 
 if( $_SERVER['REQUEST_METHOD'] != "POST" ) {
 	echo "need 'POST' request";
-/	exit( 1 );
+	exit( 1 );
 }
 
 
