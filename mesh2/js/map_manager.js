@@ -2,6 +2,7 @@ var MapManager = function( wagon_manager ) {
 	this.map = {};
   this.mesh = {};
   this.track = {};
+  this.trips = [];
   this.wagon_manager = wagon_manager;
   this.HTMLredraw = new HTMLredraw();
   google.maps.event.addDomListener( window, 'load', this.init.bind( this ) );
@@ -16,7 +17,7 @@ MapManager.prototype.init = function() {
 
   this.map = new google.maps.Map( document.getElementById('map-canvas'), mapOptions );
 
-//  this.wagon_manager.runGear( this.map );
+  this.wagon_manager.runGear( this.map );
   this.mesh = new Mesh( this.map );
   this.track = new Track( this.map );
   
@@ -95,13 +96,19 @@ MapManager.prototype.drawTrack = function( wagon_guid, date_from, date_to ) {
   request.open( "GET", req, true );
   request.send( null );
   request.onreadystatechange = function () {
-		if( request.readyState == 4 && request.responseText.length > 0 ) {
-			var json = JSON.parse( request.responseText );
-      this.HTMLredraw.updateDotsCount( json.data.length );
-      this.track.createFromJson( json.data );
-      this.HTMLredraw.stopProgress();
-      this.wagon_manager.runGear( this.map );
-		}
-	}.bind(this);
+      if (request.readyState == 4 && request.responseText.length > 0) {
+          var json = JSON.parse(request.responseText);
+          this.HTMLredraw.updateDotsCount(json.data.length);
+          this.track.createFromJson(json.data);
+          this.HTMLredraw.stopProgress();
+          this.wagon_manager.runGear(this.map);
+          this.centerOnCoordinate( this.track.first );
+      }
+  }.bind(this);
 };
 
+MapManager.prototype.centerOnCoordinate = function( coordinate ) {
+    this.map.setOptions( { 
+		center: coordinate
+	} );
+}

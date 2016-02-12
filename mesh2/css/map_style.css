@@ -119,3 +119,16 @@ body {
 .firstHeading {
 	font-weight: bold;
 }
+
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: 3px 3px; /* adjust here */
+    margin-bottom: 0px;
+    border: 1px solid #ddd;
+    line-height: 1.5em /* set to text height */
+}
+
+span.badge.pull-left {
+    margin-right: 3px;
+}

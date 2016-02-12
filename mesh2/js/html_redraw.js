@@ -40,11 +40,13 @@ HTMLredraw.prototype.createUgreshkaCtrl = function( map ) {
 
 HTMLredraw.prototype.createDrawTrackButton = function( mm ) {
   var self = this;
+  //alert("caller is " + arguments.callee.caller.toString());
   $( "#redrawBtn2" ).on( "click", function( e ) {
-      var wagon_guid = "36353431-6262-3332-6332-393534333937";
+      var wagon_guid = "46906FD8-3B31-4FC4-9E33-3ED3BE607C07";
       var date_from = self.getDateFrom().subtract( 3, 'hour' );
       var date_to = self.getDateTo().subtract( 3, 'hour' );
       mm.drawTrack( wagon_guid, date_from, date_to );
+      self.fillTripsList();
   } );
 };
 
@@ -79,9 +81,10 @@ HTMLredraw.prototype.fillWagonsSelector = function( wm ) {
     console.log("wagons.length = " + wm.wagons_list.length);
     for (var w in wm.wagons_list) {
       var wagon = wm.wagons_list[w];
+      var vn = wagon.name.trim(); 
       cmbItems += '<li><a href="#" '
       + ' id="' + wagon.id + '">'
-      + wagon.name.trim()
+      + vn.substring( 0, vn.lastIndexOf( '(' ) )
       + '</a></li>';
     }
 
@@ -174,3 +177,48 @@ HTMLredraw.prototype.fillRoadsSelector = function() {
   };
 };
 
+HTMLredraw.prototype.fillTripsList = function() {
+    console.log( "fillTripsList" );
+    RecursiveUnbind( $( "#listgroup-trips") );
+    $("#listgroup-trips").empty();
+    $("#listgroup-trips").on( 'click', '.list-group-item', function(e) {
+        e.preventDefault();
+        var val = $(this).attr( 'id' );
+        alert( val );
+    });
+    
+    var request = getXmlHttp();
+    request.overrideMimeType('text/xml');
+    var req = "/mesh/php/get_trips.php";
+    request.open("GET", req, true);
+    request.send(null);
+    request.onreadystatechange = function () {
+        if (request.status == 200 && request.readyState == 4) {
+            var json = JSON.parse( request.responseText );
+			var json_trips = json.data;
+            var c = 1;
+			for( var jt in json_trips ) {
+                var jtrip = json_trips[ jt ];
+                var tn = jtrip[ 'name' ];
+                var td = moment( jtrip[ 'date_begin' ] ).format( 'DD/MM/YYYY HH:mm' );
+                $("#listgroup-trips").append("<a href='#' class='list-group-item' "
+                + "id='" + jt 
+                + "'><span class='badge pull-left'>" + c++ + "</span><h3 class='list-group-item-heading'>"
+                + tn.substring( 0, tn.lastIndexOf( '(' ) )
+                + "</h3><p class='list-group-item-text'>Дата: "
+                + td
+                + "</p>"
+                + "</li>").slideDown();;
+            }                
+        }
+    }
+};
+
+function RecursiveUnbind($jElement) {
+    // remove this element's and all of its children's click events
+    $jElement.unbind();
+    $jElement.removeAttr('onclick');
+    $jElement.children().each(function () {
+        RecursiveUnbind($(this));
+    });
+}

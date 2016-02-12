@@ -2,6 +2,7 @@ function Track( map ) {
 	this.track_path = [];	
 	this.dots_in_path = 5;
 	this.map = map;
+    this.first = null;
 };
 
 Track.prototype.clear = function() {
@@ -10,6 +11,7 @@ Track.prototype.clear = function() {
   	}
 	  
 	this.track_path = [];
+    this.first = null;
 };
 
 Track.prototype.createFromJson = function( json_dots ) {
@@ -18,6 +20,10 @@ Track.prototype.createFromJson = function( json_dots ) {
 
 	for( var dot in json_dots ) {
         var d = new google.maps.LatLng( json_dots[ dot ].lat, json_dots[ dot ].lng );
+        if( this.first == null ) {
+            this.first = d;
+        }
+        
         pts.push( d );
         var speed = Math.round(json_dots[ dot ].speed / 2);
       
