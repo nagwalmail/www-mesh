@@ -115,37 +115,6 @@ HTMLredraw.prototype.fillWagonsSelector = function( wm ) {
   });
 };
 
-HTMLredraw.prototype.fillRoadsSelector = function() {
-  var request = getXmlHttp();
-  request.overrideMimeType('text/xml');
-  var req = "/mesh/php/roads_provider.php";
-  request.open("GET", req, true);
-  request.send(null);
-  request.onreadystatechange = function () {
-    if (request.status == 200 && request.readyState == 4) {
-      var cmb = document.getElementById( 'road_cmb' );
-      if( cmb == null )
-        return;
-        
-      while( cmb.options.length > 1 ) {
-          cmb.remove(1);
-      }
-      
- 			var json = JSON.parse( request.responseText );
-      
-			var json_roads = json.data;
-			for( var jr in json_roads ) {
-        
-				var jroad = json_roads[ jr ];
-        var opt = document.createElement( 'option' );
-        opt.value = jr;
-        opt.innerText = jroad;
-        cmb.appendChild( opt );
-      }
-    }
-  };
-};
-
 HTMLredraw.prototype.fillTripsList = function( wagon_guid, date_from, date_to ) {
     console.log( "fillTripsList" );
     RecursiveUnbind( $( "#listgroup-trips") );
