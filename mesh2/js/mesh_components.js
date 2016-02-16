@@ -34,10 +34,10 @@ function MeshPath( id, way, data, map ) {
 		pts.push( new google.maps.LatLng( points[ p ].lat, points[ p ].lng ) );
 	}
 	
-	var line = data.line;
+ 	var line = data.line;
 	this.polyline = new google.maps.Polyline({
           path: pts,
-          geodesic: false,
+          geodesic: true,
           strokeColor: line.color,
           strokeOpacity: 1.0,
           strokeWeight: line.width

@@ -17,7 +17,7 @@ Track.prototype.clear = function() {
 Track.prototype.createFromJson = function( json_dots ) {
 	var pts = [];
 	var odd = 0;
-
+    var arrow_counter = 0;
 	for( var dot in json_dots ) {
         var d = new google.maps.LatLng( json_dots[ dot ].lat, json_dots[ dot ].lng );
         if( this.first == null ) {
@@ -29,7 +29,8 @@ Track.prototype.createFromJson = function( json_dots ) {
       
         if( odd > this.dots_in_path ) {
           odd = 0;
-          var path = new TrackPath( pts, speed, json_dots[ dot ] );
+          arrow_counter++;
+          var path = new TrackPath( pts, speed, json_dots[ dot ], arrow_counter % 5 == 0 );
           path.setTrack( this );
           pts = [];
           pts.push( d );
@@ -44,15 +45,23 @@ Track.prototype.addPath = function( path ) {
 	this.track_path.push( path );	
 }; 
 
-function TrackPath( points, speed, json_dot ) {
+function TrackPath( points, speed, json_dot, with_arrow ) {
 	this.track = {}
 	var color = createColor( speed );	
+    var iconsetngs = {
+        path: google.maps.SymbolPath.FORWARD_OPEN_ARROW
+    };
+
 	this.polyline = new google.maps.Polyline({
 		path: points,
 		geodesic: false,
 		strokeColor: color,
 		strokeOpacity: 1.0,
-		strokeWeight: 2
+		strokeWeight: 2,
+        icons: [ {
+            icon: with_arrow ? iconsetngs : null,
+            offset: "100%"
+        } ]
 	});
 	
 	this.polyline.info = json_dot;

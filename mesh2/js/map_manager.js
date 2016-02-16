@@ -88,9 +88,12 @@ MapManager.prototype.drawTrack = function( wagon_guid, date_from, date_to ) {
   this.HTMLredraw.startProgress();
   this.wagon_manager.stopGear();
   var request = getXmlHttp();
-  var req = "/mesh/php/get_track.php?guid=" + wagon_guid + "&\
-      date_from=" + date_from.format( 'DD-MM-YYYY HH:mm:ss' ) + "&\
-      date_to=" + date_to.format( 'DD-MM-YYYY HH:mm:ss' );
+//   var req = "/mesh/php/get_track.php?guid=" + wagon_guid + "&\
+//       date_from=" + date_from.format( 'DD-MM-YYYY HH:mm:ss' ) + "&\
+//       date_to=" + date_to.format( 'DD-MM-YYYY HH:mm:ss' );
+  var req = "/mesh/php/get_track.php?guid=" + wagon_guid 
+    + "&date_from=" + date_from 
+    + "&date_to=" + date_to;
       
   console.log( req );
   request.open( "GET", req, true );

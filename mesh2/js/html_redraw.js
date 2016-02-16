@@ -46,8 +46,9 @@ HTMLredraw.prototype.createDrawTrackButton = function( mm ) {
       var wagon_guid = self.getSelectedWagonGuid();
       var date_from = self.getDateFrom().subtract( 3, 'hour' );
       var date_to = self.getDateTo().subtract( 3, 'hour' );
-      mm.drawTrack( wagon_guid, date_from, date_to );
-      self.fillTripsList( wagon_guid, date_from, date_to );
+//      mm.drawTrack( wagon_guid, date_from, date_to );
+      mm.track.clear();
+      self.fillTripsList( mm, wagon_guid, date_from, date_to );
   } );
 };
 
@@ -115,7 +116,7 @@ HTMLredraw.prototype.fillWagonsSelector = function( wm ) {
   });
 };
 
-HTMLredraw.prototype.fillTripsList = function( wagon_guid, date_from, date_to ) {
+HTMLredraw.prototype.fillTripsList = function( mm, wagon_guid, date_from, date_to ) {
     console.log( "fillTripsList" );
     RecursiveUnbind( $( "#listgroup-trips") );
     $("#listgroup-trips").empty();
@@ -124,7 +125,7 @@ HTMLredraw.prototype.fillTripsList = function( wagon_guid, date_from, date_to ) 
         e.preventDefault();
         var val = $(this).attr( 'trip_guid' );
         //alert( val );
-        alert( val );
+        mm.drawTrack( wagon_guid, $(this).attr( 'date_from' ), $(this).attr( 'date_to' ) );
     });
     
     var request = getXmlHttp();
@@ -146,6 +147,8 @@ HTMLredraw.prototype.fillTripsList = function( wagon_guid, date_from, date_to ) 
                 $("#listgroup-trips").append( "<a href='#' class='list-group-item' "
                     + "id='" + -1
                     + "' trip_guid='" + EMPTY_GUID
+                    + "' date_from='" + date_from.format( 'DD-MM-YYYY HH:mm:ss' )
+                    + "' date_to='" + date_to.format( 'DD-MM-YYYY HH:mm:ss' )
                     + "'><span class='badge pull-left'>1-" + json_trips.length
                     + "</span>"                 
                     + "<h3 class='list-group-item-heading'>За весь период</h3><p class='list-group-item-text'></p>"
@@ -159,6 +162,8 @@ HTMLredraw.prototype.fillTripsList = function( wagon_guid, date_from, date_to ) 
                 $("#listgroup-trips").append( "<a href='#' class='list-group-item' "
                     + "id='" + jt 
                     + "' trip_guid='" + jtrip[ 'guid' ]
+                    + "' date_from='" + moment( jtrip[ 'date_begin' ] ).format( 'DD-MM-YYYY HH:mm:ss' )
+                    + "' date_to='" + moment( jtrip[ 'date_end' ] ).format( 'DD-MM-YYYY HH:mm:ss' )
                     + "'><span class='badge pull-left'>" + c++ 
                     + "</span><h3 class='list-group-item-heading'>"
                     + tn.substring( 0, tn.lastIndexOf( '(' ) )
