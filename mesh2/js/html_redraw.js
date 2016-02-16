@@ -1,6 +1,7 @@
 function HTMLredraw() {
 	this.bodyWrap = document.querySelector('body');
 	this.mapWrap = document.querySelector('#map-canvas');
+    this.selectedWagonGuid = null;
 }
 
 HTMLredraw.prototype.createUgreshkaCtrl = function( map ) {
@@ -42,11 +43,11 @@ HTMLredraw.prototype.createDrawTrackButton = function( mm ) {
   var self = this;
   //alert("caller is " + arguments.callee.caller.toString());
   $( "#redrawBtn2" ).on( "click", function( e ) {
-      var wagon_guid = "46906FD8-3B31-4FC4-9E33-3ED3BE607C07";
+      var wagon_guid = self.getSelectedWagonGuid();
       var date_from = self.getDateFrom().subtract( 3, 'hour' );
       var date_to = self.getDateTo().subtract( 3, 'hour' );
       mm.drawTrack( wagon_guid, date_from, date_to );
-      self.fillTripsList();
+      self.fillTripsList( wagon_guid, date_from, date_to );
   } );
 };
 
@@ -63,6 +64,10 @@ HTMLredraw.prototype.getDateTo = function() {
     return $( "#datetimepicker2" ).data( "DateTimePicker" ).date();
 };
 
+HTMLredraw.prototype.getSelectedWagonGuid = function() {
+    return this.selectedWagonGuid;
+};
+
 HTMLredraw.prototype.startProgress = function() {
     document.getElementById( 'get_track_progress' ).style.visibility = "visible";  
 };
@@ -76,6 +81,7 @@ HTMLredraw.prototype.updateDotsCount = function( count ) {
 }
 
 HTMLredraw.prototype.fillWagonsSelector = function( wm ) {
+  var self = this;
   wm.getWagonsList(function () {
     var cmbItems = "";
     console.log("wagons.length = " + wm.wagons_list.length);
@@ -83,7 +89,7 @@ HTMLredraw.prototype.fillWagonsSelector = function( wm ) {
       var wagon = wm.wagons_list[w];
       var vn = wagon.name.trim(); 
       cmbItems += '<li><a href="#" '
-      + ' id="' + wagon.id + '">'
+      + ' guid="' + wagon.guid + '">'
       + vn.substring( 0, vn.lastIndexOf( '(' ) )
       + '</a></li>';
     }
@@ -100,50 +106,13 @@ HTMLredraw.prototype.fillWagonsSelector = function( wm ) {
     });
 
     $('.dropdown').on('click', 'li', function ( event ) {
-      console.log( "selected " + event.currentTarget.innerText );
+      var wagon_guid = $( event.currentTarget.innerHTML ).attr( "guid" );
       var selText = $(this).text();
       $(this).parents('.dropdown').find('.dropdown-toggle').html(selText);
+      self.selectedWagonGuid = wagon_guid;
        //$('.dropdown').html($(this).find('a').html());
     });
   });
-  
-  // var request = getXmlHttp();
-  // request.overrideMimeType('text/xml');
-  // var req = "/mesh/php/get_wagons.php";
-  // request.open("GET", req, true);
-  // request.send(null);
-  // request.onreadystatechange = function () {
-  //   console.log( "fillWagonsSelector request.status = " + request.status );
-  //   var cmbItems = "";
-  //   if (request.status == 200 && request.readyState == 4) {
- 	// 		var json = JSON.parse( request.responseText );
-	// 		var json_wagons = json.data;
-	// 		for( var jw in json_wagons ) {
-	// 			var jwagon = json_wagons[ jw ];
-  //       cmbItems += '<li><a href="#" '
-  //         + ' id="' + jwagon[ "id" ] + '">'  
-  //         + jwagon[ "name" ].trim()
-  //         + '</a></li>';
-  //     }
-      
-      
-      
-      
-  //     console.log( cmbItems );
-  //     $('#wagonDropdown').on( 'click', 'a[data-toggle="dropdown"]', function() {   
-  //         if( $(this).children().length <= 0 ) {
-  //             $(this).after( '<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" >'+
-  //                 cmbItems + '</ul>' );
-  //                 
-  //             $(this).dropdown();
-  //         }
-  //     } );
-  //     
-  //     $('#wagonDropdown').on( 'click', 'li', function() {
-  //         console.log( "selected " + this.id );
-  //     } );
-  //   }
-  // };
 };
 
 HTMLredraw.prototype.fillRoadsSelector = function() {
@@ -177,19 +146,25 @@ HTMLredraw.prototype.fillRoadsSelector = function() {
   };
 };
 
-HTMLredraw.prototype.fillTripsList = function() {
+HTMLredraw.prototype.fillTripsList = function( wagon_guid, date_from, date_to ) {
     console.log( "fillTripsList" );
     RecursiveUnbind( $( "#listgroup-trips") );
     $("#listgroup-trips").empty();
+    var self = this;
     $("#listgroup-trips").on( 'click', '.list-group-item', function(e) {
         e.preventDefault();
-        var val = $(this).attr( 'id' );
+        var val = $(this).attr( 'trip_guid' );
+        //alert( val );
         alert( val );
     });
     
     var request = getXmlHttp();
     request.overrideMimeType('text/xml');
-    var req = "/mesh/php/get_trips.php";
+    var req = "/mesh/php/get_trips.php?wagon_guid=" + wagon_guid 
+        + "&date_from=" + date_from.format( 'DD-MM-YYYY HH:mm:ss' ) 
+        + "&date_to=" + date_to.format( 'DD-MM-YYYY HH:mm:ss' );
+
+        
     request.open("GET", req, true);
     request.send(null);
     request.onreadystatechange = function () {
@@ -197,18 +172,31 @@ HTMLredraw.prototype.fillTripsList = function() {
             var json = JSON.parse( request.responseText );
 			var json_trips = json.data;
             var c = 1;
+            if( json_trips.length > 0 ) {
+                var EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
+                $("#listgroup-trips").append( "<a href='#' class='list-group-item' "
+                    + "id='" + -1
+                    + "' trip_guid='" + EMPTY_GUID
+                    + "'><span class='badge pull-left'>1-" + json_trips.length
+                    + "</span>"                 
+                    + "<h3 class='list-group-item-heading'>За весь период</h3><p class='list-group-item-text'></p>"
+                    + "</li>" ).slideDown();
+            }
+                        
 			for( var jt in json_trips ) {
                 var jtrip = json_trips[ jt ];
                 var tn = jtrip[ 'name' ];
                 var td = moment( jtrip[ 'date_begin' ] ).format( 'DD/MM/YYYY HH:mm' );
-                $("#listgroup-trips").append("<a href='#' class='list-group-item' "
-                + "id='" + jt 
-                + "'><span class='badge pull-left'>" + c++ + "</span><h3 class='list-group-item-heading'>"
-                + tn.substring( 0, tn.lastIndexOf( '(' ) )
-                + "</h3><p class='list-group-item-text'>Дата: "
-                + td
-                + "</p>"
-                + "</li>").slideDown();;
+                $("#listgroup-trips").append( "<a href='#' class='list-group-item' "
+                    + "id='" + jt 
+                    + "' trip_guid='" + jtrip[ 'guid' ]
+                    + "'><span class='badge pull-left'>" + c++ 
+                    + "</span><h3 class='list-group-item-heading'>"
+                    + tn.substring( 0, tn.lastIndexOf( '(' ) )
+                    + "</h3><p class='list-group-item-text'>Дата: "
+                    + td
+                    + "</p>"
+                    + "</li>" ).slideDown();
             }                
         }
     }
