@@ -120,6 +120,11 @@ body {
 	font-weight: bold;
 }
 
+#listgroup-trips {
+    max-height: 300px;
+    overflow-y: scroll; 
+}
+
 .list-group-item {
     position: relative;
     display: block;
